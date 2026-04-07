@@ -34,6 +34,7 @@ jobs:
       run: bandit -r src --exit-zero # Won't stop build for style issues
 
     - name: Run unit tests (PROC-09 / TVR-01)
+    shell: bash
       run: pytest tests/ || echo "No tests found yet"
 
     - name: Build Executable with PyInstaller (FR-01)
