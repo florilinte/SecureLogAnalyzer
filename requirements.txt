@@ -4,3 +4,4 @@ flake8>=6.1.0
 bandit>=1.7.5
 pyinstaller>=6.3.0
 pip-audit>=2.7.0
+setuptools>=70.0.0
