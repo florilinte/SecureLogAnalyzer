@@ -1,0 +1,45 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+jobs:
+  build-test-deploy:
+    runs-on: windows-latest # Creates a Windows .exe for FR-01
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Dependency Scanning (PROC-06 / NFR-03)
+      run: pip-audit
+
+    - name: Static code analysis with Flake8 (PROC-04 / NFR-11)
+      run: flake8 src --count --show-source --statistics
+
+    - name: Security scan with Bandit (NFR-03)
+      run: bandit -r src
+
+    - name: Run unit tests (PROC-09 / TVR-01)
+      run: pytest tests/ --cov=src --cov-report=xml
+
+    - name: Build Executable with PyInstaller (FR-01)
+      run: pyinstaller --onefile --windowed src/main.py
+
+    - name: Upload Executable Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: SecureLogAnalyzer-Windows-EXE
+        path: dist/main.exe
